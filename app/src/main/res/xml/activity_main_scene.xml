@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/start">
+
+        <Constraint
+            android:id="@+id/cardOfDailyWeather"
+            android:layout_width="match_parent"
+            android:layout_height="195dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/purple_50"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/weatherFor7Days"
+            app:layout_constraintVertical_bias="1.0"
+            app:shapeAppearanceOverlay="@style/CornerCutWithMotion" />
+
+        <Constraint
+            android:id="@+id/upArrowLottie"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/cardOfDailyWeather"
+            app:layout_constraintStart_toStartOf="@+id/cardOfDailyWeather"
+            app:layout_constraintTop_toTopOf="@+id/cardOfDailyWeather"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <Constraint
+            android:id="@+id/cardOfCurrentWeather"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <Constraint
+            android:id="@+id/dailyWeatherStateRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="@+id/cardOfDailyWeather"
+            app:layout_constraintEnd_toEndOf="@+id/cardOfDailyWeather"
+            app:layout_constraintStart_toStartOf="@+id/cardOfDailyWeather"
+            app:layout_constraintTop_toBottomOf="@+id/upArrowLottie" />
+
+        <Constraint android:id="@+id/start" />
+        <Constraint
+            app:layout_constraintEnd_toEndOf="@id/editSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/editSearch"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintTop_toTopOf="@id/editSearch"
+            app:layout_constraintStart_toStartOf="@id/editSearch"
+            android:id="@+id/searching"
+            app:layout_constraintHorizontal_bias="1.0" />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+
+        <Constraint
+            android:id="@+id/cardOfDailyWeather"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="0dp"
+            android:background="@color/purple_50"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/weatherFor7Days"
+            app:layout_constraintVertical_bias="1.0"
+            app:shapeAppearanceOverlay="@style/CornerCutWithMotion" />
+
+        <Constraint
+            android:id="@+id/upArrowLottie"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="180"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/cardOfDailyWeather"
+            app:layout_constraintStart_toStartOf="@+id/cardOfDailyWeather"
+            app:layout_constraintTop_toTopOf="@+id/cardOfDailyWeather"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <Constraint
+            android:id="@+id/cardOfCurrentWeather"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <Constraint
+            android:id="@+id/dailyWeatherStateRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="@+id/cardOfDailyWeather"
+            app:layout_constraintEnd_toEndOf="@+id/cardOfDailyWeather"
+            app:layout_constraintStart_toStartOf="@+id/cardOfDailyWeather"
+            app:layout_constraintTop_toBottomOf="@+id/upArrowLottie" />
+
+
+        <Constraint android:id="@id/end" />
+    </ConstraintSet>
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@+id/start">
+
+        <OnSwipe
+            app:dragDirection="dragUp"
+            app:touchAnchorId="@+id/cardOfDailyWeather" />
+    </Transition>
+</MotionScene>
