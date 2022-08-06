@@ -14,11 +14,11 @@ import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.amnah.weather.R
-import com.amnah.weather.databinding.ActivityMainBinding
-import com.amnah.weather.data.model.Current
-import com.amnah.weather.data.model.WeatherResponse
+import com.amnah.weather.data.model.onecall.Current
+import com.amnah.weather.data.model.onecall.WeatherResponse
 import com.amnah.weather.data.model.search.SearchWeatherResponse
 import com.amnah.weather.data.network.ApiClient
+import com.amnah.weather.databinding.ActivityMainBinding
 import com.amnah.weather.util.Constants
 import com.amnah.weather.util.CustomImage
 import com.amnah.weather.util.DateFormatWeather
@@ -126,6 +126,7 @@ class MainActivity : AppCompatActivity() {
                 Log.i("lllllllllllll", e.message.toString())
 
             }
+
             override fun onResponse(call: Call, response: Response) {
                 response.body()?.string()?.let { jsonString ->
                     val result = Gson().fromJson(jsonString, SearchWeatherResponse::class.java)
