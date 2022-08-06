@@ -16,7 +16,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.amnah.weather.R
 import com.amnah.weather.databinding.ActivityMainBinding
+import com.amnah.weather.model.Current
 import com.amnah.weather.model.WeatherResponse
+import com.amnah.weather.model.search.SearchWeatherResponse
 import com.amnah.weather.util.Constants
 import com.amnah.weather.util.CustomImage
 import com.amnah.weather.util.DateFormatWeather
@@ -33,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.SplashScreenTheme)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(requireNotNull(_binding.root))
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -75,44 +78,93 @@ class MainActivity : AppCompatActivity() {
                     runOnUiThread {
                         _binding.apply {
                             searching.setOnClickListener {
-                                Toast.makeText(this@MainActivity, editSearch.text.toString(), LENGTH_SHORT).show()
-                            }
-
-                            current?.weather?.joinToString { it?.id.toString() }
-                                ?.let { CustomImage.getImage(it) }
-                                ?.also {
-                                    currentIconWeather.setImageResource(it)
-                                }
-                            temperature.text = "${current?.temp?.toInt()}ْْ C"
-
-                            currentStateWeather.text = current?.weather?.joinToString {
-                                it?.description.toString()
-                            }
-
-                            date.text = current?.dt?.let {
-                                DateFormatWeather.getDateTime(
-                                    it,
-                                    "EEEE.d MMMM"
-                                )
-                            }
-
-                            tempWind.text = "${current?.windSpeed?.toInt()}ْْkm/h"
-
-                            tempHumidity.text = "${current?.humidity}ْْ%"
-
-                            tempClouds.text = "${current?.clouds}%"
-
-                            dailyWeatherStateRecycler.adapter = result.daily?.let {
-                                DailyWeatherAdapter(
-                                    it
-                                )
+                                getSearching(editSearch.text.toString())
                             }
                         }
+
+                        current?.let { showData(result, it) }
 
                     }
                 }
             }
         })
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun showData(
+        result: WeatherResponse,
+        current: Current
+    ) {
+
+        _binding.apply {
+            current.weather?.joinToString { it?.id.toString() }
+                ?.let { CustomImage.getImage(it) }
+                ?.also {
+                    currentIconWeather.setImageResource(it)
+                }
+            temperature.text = "${current.temp?.toInt()}ْْ C"
+
+            currentStateWeather.text = current.weather?.joinToString {
+                it?.description.toString()
+            }
+
+            date.text = current.dt?.let {
+                DateFormatWeather.getDateTime(
+                    it,
+                    "EEEE.d MMMM"
+                )
+            }
+
+            tempWind.text = "${current.windSpeed?.toInt()}ْْkm/h"
+
+            tempHumidity.text = "${current.humidity}ْْ%"
+
+            tempClouds.text = "${current.clouds}%"
+
+            dailyWeatherStateRecycler.adapter = result.daily?.let {
+                DailyWeatherAdapter(
+                    it
+                )
+            }
+        }
+
+    }
+
+    fun getSearching(name: String) {
+
+        val urlWeather = HttpUrl.Builder()
+            .scheme(Constants.SCHEME)
+            .host(Constants.BASE_URL)
+            .addPathSegments(Constants.PATH_SEGMENTS_BY_NAME)
+            .addQueryParameter(Constants.Q, name)
+            .addQueryParameter(Constants.APP_ID, Constants.API_KEY)
+            .build()
+
+        val request = Request.Builder()
+            .url(urlWeather)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.i("lllllllllllll", e.message.toString())
+
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.body()?.string()?.let { jsonString ->
+                    val result = Gson().fromJson(jsonString, SearchWeatherResponse::class.java)
+
+                    runOnUiThread {
+                        makeRequestForWeatherApi(
+                            result?.coord?.lat.toString(),
+                            result?.coord?.lon.toString()
+                        )
+                    }
+                }
+            }
+
+        })
+
     }
 
     private fun getCurrentLocation() {
@@ -145,7 +197,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermission(): Boolean {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) ==
             PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -196,9 +251,5 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val PERMISSION_REQUEST_ACCESS_LOCATION = 100
-    }
-
-    fun View.visibleLayout() {
-        this.visibility = View.VISIBLE
     }
 }

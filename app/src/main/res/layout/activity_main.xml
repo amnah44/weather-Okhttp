@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:layout_height="match_parent"
     app:layoutDescription="@xml/activity_main_scene"
     tools:context=".ui.MainActivity">
@@ -230,7 +231,7 @@
         android:layout_width="match_parent"
         android:layout_height="195dp"
         android:background="@color/purple_50"
-        app:shapeAppearanceOverlay="@style/CornerCutWithoutMotion"
+        app:shapeAppearanceOverlay="@style/CornerCut"
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="541dp" />
 
