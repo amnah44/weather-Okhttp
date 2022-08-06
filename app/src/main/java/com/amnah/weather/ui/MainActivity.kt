@@ -9,7 +9,6 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
@@ -19,19 +18,22 @@ import com.amnah.weather.databinding.ActivityMainBinding
 import com.amnah.weather.model.Current
 import com.amnah.weather.model.WeatherResponse
 import com.amnah.weather.model.search.SearchWeatherResponse
+import com.amnah.weather.network.ApiClient
 import com.amnah.weather.util.Constants
 import com.amnah.weather.util.CustomImage
 import com.amnah.weather.util.DateFormatWeather
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Response
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private val client = OkHttpClient()
+    private lateinit var apiClient: ApiClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,22 +51,9 @@ class MainActivity : AppCompatActivity() {
         latitude: String = Constants.DEFAULT_LATITUDE,
         longitude: String = Constants.DEFAULT_LONGITUDE
     ) {
-        val urlWeather = HttpUrl.Builder()
-            .scheme(Constants.SCHEME)
-            .host(Constants.BASE_URL)
-            .addPathSegments(Constants.PATH_SEGMENTS)
-            .addQueryParameter(Constants.UNITS, Constants.METRIC)
-            .addQueryParameter(Constants.EXCLUDE, Constants.MINUTELY)
-            .addQueryParameter(Constants.APP_ID, Constants.API_KEY)
-            .addQueryParameter(Constants.LATITUDE, latitude)
-            .addQueryParameter(Constants.LONGITUDE, longitude)
-            .build()
+        apiClient = ApiClient(latitude, longitude)
 
-        val request = Request.Builder()
-            .url(urlWeather)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
+        apiClient.client.newCall(apiClient.oneCallRequest).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i("onFailure", e.message.toString())
             }
@@ -73,7 +62,6 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call, response: Response) {
                 response.body()?.string()?.let { jsonString ->
                     val result = Gson().fromJson(jsonString, WeatherResponse::class.java)
-
                     val current = result.current
                     runOnUiThread {
                         _binding.apply {
@@ -131,20 +119,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getSearching(name: String) {
+        apiClient = ApiClient(name = name)
 
-        val urlWeather = HttpUrl.Builder()
-            .scheme(Constants.SCHEME)
-            .host(Constants.BASE_URL)
-            .addPathSegments(Constants.PATH_SEGMENTS_BY_NAME)
-            .addQueryParameter(Constants.Q, name)
-            .addQueryParameter(Constants.APP_ID, Constants.API_KEY)
-            .build()
-
-        val request = Request.Builder()
-            .url(urlWeather)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
+        apiClient.client.newCall(apiClient.weatherRequest).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i("lllllllllllll", e.message.toString())
 
@@ -191,7 +168,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         } else {
-            //request permission
+            //oneCallRequest permission
             requestPermissions()
         }
     }

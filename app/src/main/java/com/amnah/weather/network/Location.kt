@@ -44,7 +44,7 @@ class Location(
                 startActivity(intent)
             }
         } else {
-            //request permission
+            //oneCallRequest permission
             requestPermissions()
         }
     }
