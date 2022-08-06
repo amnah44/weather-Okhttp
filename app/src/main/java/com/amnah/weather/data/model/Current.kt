@@ -1,33 +1,33 @@
-package com.amnah.weather.model
+package com.amnah.weather.data.model
 
 
 import com.google.gson.annotations.SerializedName
 
-data class Hourly(
+data class Current(
     @SerializedName("clouds")
-    var clouds: Double?,
-    @SerializedName("dew_poDouble")
-    var dewPoDouble: Double?,
+    var clouds: Int?,
+    @SerializedName("dew_point")
+    var dewPoint: Double?,
     @SerializedName("dt")
-    var dt: Double?,
+    var dt: String?,
     @SerializedName("feels_like")
     var feelsLike: Double?,
     @SerializedName("humidity")
-    var humidity: Double?,
-    @SerializedName("pop")
-    var pop: Double?,
+    var humidity: Int?,
     @SerializedName("pressure")
-    var pressure: Double?,
+    var pressure: Int?,
+    @SerializedName("sunrise")
+    var sunrise: Int?,
+    @SerializedName("sunset")
+    var sunset: Int?,
     @SerializedName("temp")
     var temp: Double?,
-    @SerializedName("uvi")
-    var uvi: Double?,
     @SerializedName("visibility")
-    var visibility: Double?,
+    var visibility: Int?,
     @SerializedName("weather")
-    var weather: List<Weather>?,
+    var weather: List<Weather?>?,
     @SerializedName("wind_deg")
-    var windDeg: Double?,
+    var windDeg: Int?,
     @SerializedName("wind_gust")
     var windGust: Double?,
     @SerializedName("wind_speed")

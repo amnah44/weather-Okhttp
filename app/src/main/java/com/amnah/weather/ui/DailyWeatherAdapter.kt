@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.amnah.weather.databinding.DailyStateBinding
-import com.amnah.weather.model.Daily
+import com.amnah.weather.data.model.Daily
 import com.amnah.weather.util.CustomImage
 import com.amnah.weather.util.DateFormatWeather
 

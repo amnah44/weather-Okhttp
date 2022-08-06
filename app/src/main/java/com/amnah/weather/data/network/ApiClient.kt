@@ -1,4 +1,4 @@
-package com.amnah.weather.network
+package com.amnah.weather.data.network
 
 import com.amnah.weather.util.Constants
 import okhttp3.HttpUrl

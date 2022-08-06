@@ -1,4 +1,4 @@
-package com.amnah.weather.model
+package com.amnah.weather.data.model.search
 
 
 import com.google.gson.annotations.SerializedName

@@ -1,7 +1,8 @@
-package com.amnah.weather.network
+package com.amnah.weather.data.network
 
 import android.Manifest
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -29,12 +30,17 @@ class Location(
                     if (location == null) {
                         Toast.makeText(applicationContext, "Null Received", Toast.LENGTH_SHORT)
                             .show()
-                        Log.i("lllllllllllllnull" ,location?.latitude.toString())
                     } else {
                         Toast.makeText(applicationContext, "Get Success", Toast.LENGTH_SHORT).show()
+                        /*
+                        Need function of Request API
+                        ..
+                        ..
+                        ..
+                        ..
+                         */
                         latitude = location.latitude.toString()
                         longitude = location.longitude.toString()
-                        Log.i("lllllllllllllnotnull" ,location?.latitude.toString())
                     }
                 }
             } else {
