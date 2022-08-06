@@ -2,25 +2,22 @@ package com.amnah.weather.data.network
 
 import android.Manifest
 import android.app.Activity
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.amnah.weather.ui.MainActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 
 class Location(
-    val fusedLocationProviderClient: FusedLocationProviderClient,
-    val context: MainActivity
+    private val fusedLocationProviderClient: FusedLocationProviderClient,
+    private val context: MainActivity
 
 ) : Activity() {
-    var latitude: String =""
-    var longitude: String =""
+
     fun getCurrentLocation() {
         if (checkPermission()) {
             if (isLocationEnabled()) {
@@ -32,13 +29,6 @@ class Location(
                             .show()
                     } else {
                         Toast.makeText(applicationContext, "Get Success", Toast.LENGTH_SHORT).show()
-                        /*
-                        Need function of Request API
-                        ..
-                        ..
-                        ..
-                        ..
-                         */
                         latitude = location.latitude.toString()
                         longitude = location.longitude.toString()
                     }
@@ -107,5 +97,8 @@ class Location(
 
     companion object {
         private const val PERMISSION_REQUEST_ACCESS_LOCATION = 100
+
+        var  latitude: String =""
+        var longitude: String =""
     }
 }
