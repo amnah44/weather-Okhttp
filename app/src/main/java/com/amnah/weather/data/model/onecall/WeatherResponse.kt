@@ -1,4 +1,4 @@
-package com.amnah.weather.data.model
+package com.amnah.weather.data.model.onecall
 
 
 import com.google.gson.annotations.SerializedName

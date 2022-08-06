@@ -1,15 +1,23 @@
 package com.amnah.weather.ui
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.amnah.weather.R
-import com.amnah.weather.data.model.Current
-import com.amnah.weather.data.model.WeatherResponse
+import com.amnah.weather.data.model.onecall.Current
+import com.amnah.weather.data.model.onecall.WeatherResponse
 import com.amnah.weather.data.model.search.SearchWeatherResponse
 import com.amnah.weather.data.network.ApiClient
-import com.amnah.weather.data.network.Location
 import com.amnah.weather.databinding.ActivityMainBinding
 import com.amnah.weather.util.Constants
 import com.amnah.weather.util.CustomImage
@@ -34,8 +42,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(requireNotNull(_binding.root))
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        Location(fusedLocationProviderClient, this).getCurrentLocation()
-        makeRequestForWeatherApi()
+        getCurrentLocation()
+
 
     }
 
@@ -136,4 +144,89 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun getCurrentLocation() {
+        if (checkPermission()) {
+            if (isLocationEnabled()) {
+                // for get latitude and longitude
+                fusedLocationProviderClient.lastLocation.addOnCompleteListener { task ->
+                    val location = task.result
+                    if (location == null) {
+                        Toast.makeText(this, "Null Received", LENGTH_SHORT)
+                            .show()
+                    } else {
+                        Toast.makeText(this, "Get Success", LENGTH_SHORT).show()
+                        makeRequestForWeatherApi(
+                            location.latitude.toString(),
+                            location.longitude.toString()
+                        )
+                    }
+                }
+            } else {
+                // for setting
+                Toast.makeText(this, "Turn on Location", LENGTH_SHORT).show()
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(intent)
+            }
+        } else {
+            //oneCallRequest permission
+            requestPermissions()
+        }
+    }
+
+    private fun checkPermission(): Boolean {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) ==
+            PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            return true
+        }
+
+        return false
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
+    }
+
+    private fun requestPermissions() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ),
+            PERMISSION_REQUEST_ACCESS_LOCATION
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_ACCESS_LOCATION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Granted", LENGTH_SHORT).show()
+                getCurrentLocation()
+            } else {
+                Toast.makeText(this, "Denied", LENGTH_SHORT).show()
+
+            }
+        }
+    }
+
+    companion object {
+        private const val PERMISSION_REQUEST_ACCESS_LOCATION = 100
+    }
 }
