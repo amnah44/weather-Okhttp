@@ -16,19 +16,14 @@ import androidx.core.app.ActivityCompat
 import com.amnah.weather.R
 import com.amnah.weather.data.model.onecall.Current
 import com.amnah.weather.data.model.onecall.WeatherResponse
-import com.amnah.weather.data.model.search.SearchWeatherResponse
 import com.amnah.weather.data.network.ApiClient
+import com.amnah.weather.data.network.ClientOkhttp
 import com.amnah.weather.databinding.ActivityMainBinding
 import com.amnah.weather.util.Constants
 import com.amnah.weather.util.CustomImage
 import com.amnah.weather.util.DateFormatWeather
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.gson.Gson
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
-import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
@@ -53,34 +48,28 @@ class MainActivity : AppCompatActivity() {
     ) {
         apiClient = ApiClient(latitude, longitude)
 
-        apiClient.client.newCall(apiClient.oneCallRequest).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.i("onFailure", e.message.toString())
-            }
+        val clientOkhttp = ClientOkhttp()
 
-            @SuppressLint("SetTextI18n")
-            override fun onResponse(call: Call, response: Response) {
-                response.body()?.string()?.let { jsonString ->
-                    val result = Gson().fromJson(jsonString, WeatherResponse::class.java)
-                    val current = result.current
-                    runOnUiThread {
-                        _binding.apply {
-                            searching.setOnClickListener {
-                                getSearching(editSearch.text.toString())
-                            }
-                        }
+        clientOkhttp.getOneCallRequest { result ->
+            val current = result.current
 
-                        current?.let { showData(result, it) }
+            runOnUiThread {
+                _binding.apply {
 
+                    current?.let { showData(it) }
+
+                    dailyWeatherStateRecycler.adapter = result.daily?.let {
+                        DailyWeatherAdapter(
+                            it
+                        )
                     }
                 }
             }
-        })
+        }
     }
 
     @SuppressLint("SetTextI18n")
     fun showData(
-        result: WeatherResponse,
         current: Current
     ) {
 
@@ -109,40 +98,36 @@ class MainActivity : AppCompatActivity() {
 
             tempClouds.text = "${current.clouds}%"
 
-            dailyWeatherStateRecycler.adapter = result.daily?.let {
-                DailyWeatherAdapter(
-                    it
-                )
-            }
+
         }
 
     }
 
-    fun getSearching(name: String) {
-        apiClient = ApiClient(name = name)
-
-        apiClient.client.newCall(apiClient.weatherRequest).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.i("lllllllllllll", e.message.toString())
-
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.body()?.string()?.let { jsonString ->
-                    val result = Gson().fromJson(jsonString, SearchWeatherResponse::class.java)
-
-                    runOnUiThread {
-                        makeRequestForWeatherApi(
-                            result?.coord?.lat.toString(),
-                            result?.coord?.lon.toString()
-                        )
-                    }
-                }
-            }
-
-        })
-
-    }
+//    fun getSearching(name: String) {
+//        apiClient = ApiClient(name = name)
+//
+//        apiClient.client.newCall(apiClient.getWeatherRequest()).enqueue(object : Callback {
+//            override fun onFailure(call: Call, e: IOException) {
+//                Log.i("lllllllllllll", e.message.toString())
+//
+//            }
+//
+//            override fun onResponse(call: Call, response: Response) {
+//                response.body?.string()?.let { jsonString ->
+//                    val result = Gson().fromJson(jsonString, SearchWeatherResponse::class.java)
+//
+//                    runOnUiThread {
+//                        makeRequestForWeatherApi(
+//                            result?.coord?.lat.toString(),
+//                            result?.coord?.lon.toString()
+//                        )
+//                    }
+//                }
+//            }
+//
+//        })
+//
+//    }
 
     private fun getCurrentLocation() {
         if (checkPermission()) {
