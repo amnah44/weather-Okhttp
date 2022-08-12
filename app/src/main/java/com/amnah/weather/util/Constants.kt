@@ -1,6 +1,14 @@
 package com.amnah.weather.util
 
 object Constants {
+    const val ONE_HUNDRED = 100
+    const val GRANTED = "Granted"
+    const val DENIED = "Denied"
+    const val NULL_RECEIVED = "Null Received"
+    const val GET_SUCCESS = "Get Success"
+    const val  TURN_ON_LOCATION= "Turn on Location"
+
+
     const val  SCHEME = "https"
     const val BASE_URL = "api.openweathermap.org"
     const val PATH_SEGMENTS = "data/2.5/onecall"
@@ -16,5 +24,12 @@ object Constants {
     const val LONGITUDE = "lon"
 
     const val DEFAULT_LATITUDE = "33.3152"
-    const val DEFAULT_LONGITUDE = "43.6793"
+    const val DEFAULT_LONGITUDE = "44.3661"
+    const val DEFAULT_CITY_NAME = "baghdad"
+
+    const val ERROR_MESSAGE = "OnFailure"
+
+    const val C_temperature = "ْْ C"
+    const val WIND_SPEED_SCALE = "km/h"
+    const val MOOD = "%"
 }

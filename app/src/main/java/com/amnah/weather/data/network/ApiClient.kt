@@ -5,9 +5,9 @@ import com.amnah.weather.util.Constants
 import okhttp3.HttpUrl
 
 class ApiClient(
-    val latitude: String = "33.3152",
-    val longitude: String = "44.3661",
-    val cityName: String = "Baghdad"
+    val latitude: String = Constants.DEFAULT_LATITUDE,
+    val longitude: String = Constants.DEFAULT_LONGITUDE,
+    val cityName: String = Constants.DEFAULT_CITY_NAME
 ) {
 
     fun getOneCallUrl(): HttpUrl {

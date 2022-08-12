@@ -3,6 +3,7 @@ package com.amnah.weather.data.network
 import android.util.Log
 import com.amnah.weather.data.model.onecall.WeatherResponse
 import com.amnah.weather.data.model.search.SearchWeatherResponse
+import com.amnah.weather.util.Constants
 import com.google.gson.Gson
 import okhttp3.*
 import java.io.IOException
@@ -26,7 +27,7 @@ class ClientOkhttp {
 
         client.newCall(response).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i("OnFailure", e.message.toString())
+                Log.i(Constants.ERROR_MESSAGE, e.message.toString())
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -52,7 +53,7 @@ class ClientOkhttp {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i("OnFailure", e.message.toString())
+                Log.i(Constants.ERROR_MESSAGE, e.message.toString())
             }
 
             override fun onResponse(call: Call, response: Response) {

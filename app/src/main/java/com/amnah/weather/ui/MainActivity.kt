@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     private fun makeRequestForWeatherApi(
         latitude: String = Constants.DEFAULT_LATITUDE,
         longitude: String = Constants.DEFAULT_LONGITUDE
@@ -72,18 +73,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun searchWeather(clientOkhttp: ClientOkhttp, name: String) {
-        clientOkhttp.getSearchWeather(name = name) { response ->
-            val coord = response.coord
-            runOnUiThread {
-                makeRequestForWeatherApi(
-                    latitude = coord?.lat.toString(),
-                    longitude = coord?.lon.toString(),
-                )
-            }
-        }
-    }
-
     @SuppressLint("SetTextI18n")
     fun showData(
         current: Current
@@ -95,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                 ?.also {
                     currentIconWeather.setImageResource(it)
                 }
-            temperature.text = "${current.temp?.toInt()}ْْ C"
+            temperature.text = "${current.temp?.toInt()}${Constants.C_temperature}"
 
             currentStateWeather.text = current.weather?.joinToString {
                 it?.description.toString()
@@ -108,16 +97,27 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-            tempWind.text = "${current.windSpeed?.toInt()}ْْkm/h"
+            tempWind.text = "${current.windSpeed?.toInt()}ْْ${Constants.WIND_SPEED_SCALE}"
 
-            tempHumidity.text = "${current.humidity}ْْ%"
+            tempHumidity.text = "${current.humidity}ْْ${Constants.MOOD}"
 
-            tempClouds.text = "${current.clouds}%"
-
-
+            tempClouds.text = "${current.clouds}${Constants.MOOD}"
         }
-
     }
+
+
+    private fun searchWeather(clientOkhttp: ClientOkhttp, name: String) {
+        clientOkhttp.getSearchWeather(name = name) { response ->
+            val coord = response.coord
+            runOnUiThread {
+                makeRequestForWeatherApi(
+                    latitude = coord?.lat.toString(),
+                    longitude = coord?.lon.toString(),
+                )
+            }
+        }
+    }
+
 
     private fun getCurrentLocation() {
         if (checkPermission()) {
@@ -126,10 +126,10 @@ class MainActivity : AppCompatActivity() {
                 fusedLocationProviderClient.lastLocation.addOnCompleteListener { task ->
                     val location = task.result
                     if (location == null) {
-                        Toast.makeText(this, "Null Received", LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(this, Constants.NULL_RECEIVED, LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(this, "Get Success", LENGTH_SHORT).show()
+                        Toast.makeText(this, Constants.GET_SUCCESS , LENGTH_SHORT).show()
+
                         makeRequestForWeatherApi(
                             location.latitude.toString(),
                             location.longitude.toString()
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 // for setting
-                Toast.makeText(this, "Turn on Location", LENGTH_SHORT).show()
+                Toast.makeText(this, Constants.TURN_ON_LOCATION, LENGTH_SHORT).show()
                 val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivity(intent)
             }
@@ -192,16 +192,16 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQUEST_ACCESS_LOCATION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Granted", LENGTH_SHORT).show()
+                Toast.makeText(this, Constants.GRANTED, LENGTH_SHORT).show()
                 getCurrentLocation()
             } else {
-                Toast.makeText(this, "Denied", LENGTH_SHORT).show()
+                Toast.makeText(this, Constants.DENIED, LENGTH_SHORT).show()
 
             }
         }
     }
 
     companion object {
-        private const val PERMISSION_REQUEST_ACCESS_LOCATION = 100
+        private const val PERMISSION_REQUEST_ACCESS_LOCATION = Constants.ONE_HUNDRED
     }
 }
