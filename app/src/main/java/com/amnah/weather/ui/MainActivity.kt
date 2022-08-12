@@ -15,7 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.amnah.weather.R
 import com.amnah.weather.data.model.onecall.Current
-import com.amnah.weather.data.network.ClientOkhttp
+import com.amnah.weather.data.network.OneCallClient
+import com.amnah.weather.data.network.WeatherSearchClient
 import com.amnah.weather.databinding.ActivityMainBinding
 import com.amnah.weather.util.Constants
 import com.amnah.weather.util.CustomImage
@@ -26,7 +27,6 @@ import com.google.android.gms.location.LocationServices
 class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private val clientOkhttp = ClientOkhttp()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,29 +40,27 @@ class MainActivity : AppCompatActivity() {
 
         _binding.apply {
             searching.setOnClickListener {
-                searchWeather(clientOkhttp, _binding.editSearch.text.toString())
+                searchWeather(_binding.editSearch.text.toString())
             }
         }
 
     }
 
 
-    private fun makeRequestForWeatherApi(
+    private fun makeRequestForCurrentWeather(
         latitude: String = Constants.DEFAULT_LATITUDE,
         longitude: String = Constants.DEFAULT_LONGITUDE
     ) {
 
-        currentWeather(clientOkhttp, latitude, longitude)
-    }
-
-    private fun currentWeather(clientOkhttp: ClientOkhttp, latitude: String, longitude: String) {
-        clientOkhttp.getOneCallRequest(latitude, longitude) { response ->
+        OneCallClient(latitude, longitude).getOneCallRequest() { response ->
             val current = response.current
 
             runOnUiThread {
                 _binding.apply {
                     current?.let { showData(it) }
+
                     Log.i("nnnnnnnnnnnnnnnnn", response.timezone.toString())
+
                     dailyWeatherStateRecycler.adapter = response.daily?.let {
                         DailyWeatherAdapter(
                             it
@@ -106,11 +104,11 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun searchWeather(clientOkhttp: ClientOkhttp, name: String) {
-        clientOkhttp.getSearchWeather(name = name) { response ->
+    private fun searchWeather(name: String) {
+        WeatherSearchClient(name).getSearchWeather() { response ->
             val coord = response.coord
             runOnUiThread {
-                makeRequestForWeatherApi(
+                makeRequestForCurrentWeather(
                     latitude = coord?.lat.toString(),
                     longitude = coord?.lon.toString(),
                 )
@@ -128,9 +126,9 @@ class MainActivity : AppCompatActivity() {
                     if (location == null) {
                         Toast.makeText(this, Constants.NULL_RECEIVED, LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(this, Constants.GET_SUCCESS , LENGTH_SHORT).show()
+                        Toast.makeText(this, Constants.GET_SUCCESS, LENGTH_SHORT).show()
 
-                        makeRequestForWeatherApi(
+                        makeRequestForCurrentWeather(
                             location.latitude.toString(),
                             location.longitude.toString()
                         )
