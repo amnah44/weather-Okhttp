@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
@@ -33,7 +32,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-//    private val compositeDisposable = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,11 +44,11 @@ class MainActivity : AppCompatActivity() {
 
         getCurrentLocation()
 
-//        _binding.apply {
-//            searching.setOnClickListener {
-//                searchWeather(_binding.editSearch.text.toString())
-//            }
-//        }
+        _binding.apply {
+            searching.setOnClickListener {
+                searchWeather(_binding.editSearch.text.toString())
+            }
+        }
 
     }
 
@@ -64,37 +63,27 @@ class MainActivity : AppCompatActivity() {
             emitter.onNext(OneCallClient(latitude, longitude).getOneCallRequest())
         }
 
-        observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { response ->
-                    when (response) {
-                        Status.OnLoading -> {
-                            Toast.makeText(this, "loading....", LENGTH_SHORT).show()
-                        }
-                        is Status.OnSuccess -> {
-                            _binding.apply {
-                                response.data?.current?.let { showData(it) }
-
-                                Log.i("nnnnnnnnnnnnnnnnn", response.data?.timezone.toString())
-
-                                dailyWeatherStateRecycler.adapter = response.data?.daily?.let {
-                                    DailyWeatherAdapter(
-                                        it
-                                    )
-                                }
+        observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+            { response ->
+                when (response) {
+                    Status.OnLoading -> Toast.makeText(this, "loading", LENGTH_SHORT).show()
+                    is Status.OnSuccess -> {
+                        response.data?.current?.let { showData(it) }
+                        _binding.apply {
+                            dailyWeatherStateRecycler.adapter = response.data?.daily?.let {
+                                DailyWeatherAdapter(
+                                    it
+                                )
                             }
                         }
-                        is Status.OnError -> TODO()
                     }
-                },
-                { error ->
-//                    Log.i("nnnnnnnnnnnnnnnnn", error.message.toString())
-
+                    is Status.OnFailure -> Toast.makeText(this, "error", LENGTH_SHORT).show()
                 }
-            )
-
+            }, {
+                Status.OnFailure(it.message)
+            }
+        ).addDisposable(compositeDisposable)
     }
-
 
     @SuppressLint("SetTextI18n")
     fun showData(
@@ -132,12 +121,12 @@ class MainActivity : AppCompatActivity() {
     private fun searchWeather(name: String) {
         WeatherSearchClient(name).getSearchWeather() { response ->
             val coord = response.coord
-//            runOnUiThread {
-////                makeRequestForCurrentWeather(
-////                    latitude = coord?.lat.toString(),
-////                    longitude = coord?.lon.toString(),
-////                )
-//            }
+            runOnUiThread {
+                makeRequestForCurrentWeather(
+                    latitude = coord?.lat.toString(),
+                    longitude = coord?.lon.toString(),
+                )
+            }
         }
     }
 
@@ -224,12 +213,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
+    }
+
     companion object {
         private const val PERMISSION_REQUEST_ACCESS_LOCATION = Constants.ONE_HUNDRED
     }
-//
-//    override fun onDestroy() {
-//        compositeDisposable.dispose()
-//        super.onDestroy()
-//    }
 }

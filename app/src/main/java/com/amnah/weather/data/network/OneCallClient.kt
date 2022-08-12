@@ -7,29 +7,28 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-
 class OneCallClient(
-    private val latitude: String = Constants.DEFAULT_LATITUDE,
-    private val longitude: String = Constants.DEFAULT_LONGITUDE,
+    val latitude: String = Constants.DEFAULT_LATITUDE,
+    val longitude: String = Constants.DEFAULT_LONGITUDE,
 ) {
     private val client = OkHttpClient()
 
     fun getOneCallRequest(): Status<WeatherResponse?> {
-        val request = Request.Builder().url(getOneCallUrl(latitude, longitude)).build()
+
+        val request = Request.Builder()
+            .url(getOneCallUrl()).build()
+
         val response = client.newCall(request).execute()
 
         return if (response.isSuccessful) {
             val result = Gson().fromJson(response.body?.string(), WeatherResponse::class.java)
             Status.OnSuccess(result)
         } else {
-            Status.OnError(response.message)
+            Status.OnFailure(response.message)
         }
     }
 
-    private fun getOneCallUrl(
-        lat: String,
-        lon: String,
-    ): HttpUrl {
+    private fun getOneCallUrl(): HttpUrl {
         return HttpUrl.Builder()
             .scheme(Constants.SCHEME)
             .host(Constants.BASE_URL)
@@ -37,9 +36,10 @@ class OneCallClient(
             .addQueryParameter(Constants.UNITS, Constants.METRIC)
             .addQueryParameter(Constants.EXCLUDE, Constants.MINUTELY)
             .addQueryParameter(Constants.APP_ID, Constants.API_KEY)
-            .addQueryParameter(Constants.LATITUDE, lat)
-            .addQueryParameter(Constants.LONGITUDE, lon)
+            .addQueryParameter(Constants.LATITUDE, latitude)
+            .addQueryParameter(Constants.LONGITUDE, longitude)
             .build()
     }
+
 
 }
