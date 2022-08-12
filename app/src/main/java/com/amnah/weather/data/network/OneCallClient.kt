@@ -1,11 +1,11 @@
 package com.amnah.weather.data.network
 
-import android.util.Log
 import com.amnah.weather.data.model.onecall.WeatherResponse
 import com.amnah.weather.util.Constants
 import com.google.gson.Gson
-import okhttp3.*
-import java.io.IOException
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class OneCallClient(
     val latitude: String = Constants.DEFAULT_LATITUDE,
@@ -13,30 +13,22 @@ class OneCallClient(
 ) {
     private val client = OkHttpClient()
 
-    fun getOneCallRequest(
-        getCurrentWeatherData: (response: WeatherResponse) -> Unit
-    ) {
+    fun getOneCallRequest(): Status<WeatherResponse?> {
 
-        val response = Request.Builder()
+        val request = Request.Builder()
             .url(getOneCallUrl()).build()
 
-        client.newCall(response).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.i(Constants.ERROR_MESSAGE, e.message.toString())
-            }
+        val response = client.newCall(request).execute()
 
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.string().let { jsonString ->
-                    val result = Gson().fromJson(jsonString, WeatherResponse::class.java)
-
-                    getCurrentWeatherData(result)
-                }
-            }
-
-        })
+        return if (response.isSuccessful) {
+            val result = Gson().fromJson(response.body?.string(), WeatherResponse::class.java)
+            Status.OnSuccess(result)
+        } else {
+            Status.OnFailure(response.message)
+        }
     }
 
-    fun getOneCallUrl(): HttpUrl {
+    private fun getOneCallUrl(): HttpUrl {
         return HttpUrl.Builder()
             .scheme(Constants.SCHEME)
             .host(Constants.BASE_URL)
