@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +21,7 @@ import com.amnah.weather.databinding.ActivityMainBinding
 import com.amnah.weather.util.Constants
 import com.amnah.weather.util.CustomImage
 import com.amnah.weather.util.DateFormatWeather
+import com.amnah.weather.util.addDisposable
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -68,11 +68,8 @@ class MainActivity : AppCompatActivity() {
                 when (response) {
                     Status.OnLoading -> Toast.makeText(this, "loading", LENGTH_SHORT).show()
                     is Status.OnSuccess -> {
+                        response.data?.current?.let { showData(it) }
                         _binding.apply {
-                            response.data?.current?.let { showData(it) }
-
-                            Log.i("nnnnnnnnnnnnnnnnn", response.data?.timezone.toString())
-
                             dailyWeatherStateRecycler.adapter = response.data?.daily?.let {
                                 DailyWeatherAdapter(
                                     it
@@ -85,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             }, {
                 Status.OnFailure(it.message)
             }
-        )
+        ).addDisposable(compositeDisposable)
     }
 
     @SuppressLint("SetTextI18n")
@@ -214,6 +211,11 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
+    }
+
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
     }
 
     companion object {
