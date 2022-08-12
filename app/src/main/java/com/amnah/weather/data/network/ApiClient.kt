@@ -7,11 +7,10 @@ import okhttp3.HttpUrl
 class ApiClient(
     val latitude: String = "33.3152",
     val longitude: String = "44.3661",
-    val name: String = "Baghdad"
+    val cityName: String = "Baghdad"
 ) {
 
     fun getOneCallUrl(): HttpUrl {
-        Log.i("lllllllllllApiClient", latitude)
         return HttpUrl.Builder()
             .scheme(Constants.SCHEME)
             .host(Constants.BASE_URL)
@@ -24,12 +23,13 @@ class ApiClient(
             .build()
     }
 
-    fun getWeatherUrl(): HttpUrl {
+    fun getWeatherUrl(
+    ): HttpUrl {
         return HttpUrl.Builder()
             .scheme(Constants.SCHEME)
             .host(Constants.BASE_URL)
             .addPathSegments(Constants.PATH_SEGMENTS_BY_NAME)
-            .addQueryParameter(Constants.Q, name)
+            .addQueryParameter(Constants.Q, cityName)
             .addQueryParameter(Constants.APP_ID, Constants.API_KEY)
             .build()
     }

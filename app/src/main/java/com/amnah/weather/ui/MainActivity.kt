@@ -15,8 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.amnah.weather.R
 import com.amnah.weather.data.model.onecall.Current
-import com.amnah.weather.data.model.onecall.WeatherResponse
-import com.amnah.weather.data.network.ApiClient
 import com.amnah.weather.data.network.ClientOkhttp
 import com.amnah.weather.databinding.ActivityMainBinding
 import com.amnah.weather.util.Constants
@@ -28,17 +26,23 @@ import com.google.android.gms.location.LocationServices
 class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var apiClient: ApiClient
+    private val clientOkhttp = ClientOkhttp()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.SplashScreenTheme)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(requireNotNull(_binding.root))
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         getCurrentLocation()
 
+        _binding.apply {
+            searching.setOnClickListener {
+                searchWeather(clientOkhttp, _binding.editSearch.text.toString())
+            }
+        }
 
     }
 
@@ -46,24 +50,36 @@ class MainActivity : AppCompatActivity() {
         latitude: String = Constants.DEFAULT_LATITUDE,
         longitude: String = Constants.DEFAULT_LONGITUDE
     ) {
-        apiClient = ApiClient(latitude, longitude)
 
-        val clientOkhttp = ClientOkhttp()
+        currentWeather(clientOkhttp, latitude, longitude)
+    }
 
-        clientOkhttp.getOneCallRequest { result ->
-            val current = result.current
+    private fun currentWeather(clientOkhttp: ClientOkhttp, latitude: String, longitude: String) {
+        clientOkhttp.getOneCallRequest(latitude, longitude) { response ->
+            val current = response.current
 
             runOnUiThread {
                 _binding.apply {
-
                     current?.let { showData(it) }
-
-                    dailyWeatherStateRecycler.adapter = result.daily?.let {
+                    Log.i("nnnnnnnnnnnnnnnnn", response.timezone.toString())
+                    dailyWeatherStateRecycler.adapter = response.daily?.let {
                         DailyWeatherAdapter(
                             it
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun searchWeather(clientOkhttp: ClientOkhttp, name: String) {
+        clientOkhttp.getSearchWeather(name = name) { response ->
+            val coord = response.coord
+            runOnUiThread {
+                makeRequestForWeatherApi(
+                    latitude = coord?.lat.toString(),
+                    longitude = coord?.lon.toString(),
+                )
             }
         }
     }
@@ -102,32 +118,6 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
-//    fun getSearching(name: String) {
-//        apiClient = ApiClient(name = name)
-//
-//        apiClient.client.newCall(apiClient.getWeatherRequest()).enqueue(object : Callback {
-//            override fun onFailure(call: Call, e: IOException) {
-//                Log.i("lllllllllllll", e.message.toString())
-//
-//            }
-//
-//            override fun onResponse(call: Call, response: Response) {
-//                response.body?.string()?.let { jsonString ->
-//                    val result = Gson().fromJson(jsonString, SearchWeatherResponse::class.java)
-//
-//                    runOnUiThread {
-//                        makeRequestForWeatherApi(
-//                            result?.coord?.lat.toString(),
-//                            result?.coord?.lon.toString()
-//                        )
-//                    }
-//                }
-//            }
-//
-//        })
-//
-//    }
 
     private fun getCurrentLocation() {
         if (checkPermission()) {
