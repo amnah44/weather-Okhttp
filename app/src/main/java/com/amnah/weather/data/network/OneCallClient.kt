@@ -1,42 +1,35 @@
 package com.amnah.weather.data.network
 
-import android.util.Log
 import com.amnah.weather.data.model.onecall.WeatherResponse
 import com.amnah.weather.util.Constants
 import com.google.gson.Gson
-import okhttp3.*
-import java.io.IOException
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.Request
+
 
 class OneCallClient(
-    val latitude: String = Constants.DEFAULT_LATITUDE,
-    val longitude: String = Constants.DEFAULT_LONGITUDE,
+    private val latitude: String = Constants.DEFAULT_LATITUDE,
+    private val longitude: String = Constants.DEFAULT_LONGITUDE,
 ) {
     private val client = OkHttpClient()
 
-    fun getOneCallRequest(
-        getCurrentWeatherData: (response: WeatherResponse) -> Unit
-    ) {
+    fun getOneCallRequest(): Status<WeatherResponse?> {
+        val request = Request.Builder().url(getOneCallUrl(latitude, longitude)).build()
+        val response = client.newCall(request).execute()
 
-        val response = Request.Builder()
-            .url(getOneCallUrl()).build()
-
-        client.newCall(response).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.i(Constants.ERROR_MESSAGE, e.message.toString())
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.string().let { jsonString ->
-                    val result = Gson().fromJson(jsonString, WeatherResponse::class.java)
-
-                    getCurrentWeatherData(result)
-                }
-            }
-
-        })
+        return if (response.isSuccessful) {
+            val result = Gson().fromJson(response.body?.string(), WeatherResponse::class.java)
+            Status.OnSuccess(result)
+        } else {
+            Status.OnError(response.message)
+        }
     }
 
-    fun getOneCallUrl(): HttpUrl {
+    private fun getOneCallUrl(
+        lat: String,
+        lon: String,
+    ): HttpUrl {
         return HttpUrl.Builder()
             .scheme(Constants.SCHEME)
             .host(Constants.BASE_URL)
@@ -44,10 +37,9 @@ class OneCallClient(
             .addQueryParameter(Constants.UNITS, Constants.METRIC)
             .addQueryParameter(Constants.EXCLUDE, Constants.MINUTELY)
             .addQueryParameter(Constants.APP_ID, Constants.API_KEY)
-            .addQueryParameter(Constants.LATITUDE, latitude)
-            .addQueryParameter(Constants.LONGITUDE, longitude)
+            .addQueryParameter(Constants.LATITUDE, lat)
+            .addQueryParameter(Constants.LONGITUDE, lon)
             .build()
     }
-
 
 }

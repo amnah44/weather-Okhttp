@@ -16,17 +16,24 @@ import androidx.core.app.ActivityCompat
 import com.amnah.weather.R
 import com.amnah.weather.data.model.onecall.Current
 import com.amnah.weather.data.network.OneCallClient
+import com.amnah.weather.data.network.Status
 import com.amnah.weather.data.network.WeatherSearchClient
 import com.amnah.weather.databinding.ActivityMainBinding
 import com.amnah.weather.util.Constants
 import com.amnah.weather.util.CustomImage
 import com.amnah.weather.util.DateFormatWeather
+import com.amnah.weather.util.addDisposable
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+//    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,11 +45,11 @@ class MainActivity : AppCompatActivity() {
 
         getCurrentLocation()
 
-        _binding.apply {
-            searching.setOnClickListener {
-                searchWeather(_binding.editSearch.text.toString())
-            }
-        }
+//        _binding.apply {
+//            searching.setOnClickListener {
+//                searchWeather(_binding.editSearch.text.toString())
+//            }
+//        }
 
     }
 
@@ -52,24 +59,42 @@ class MainActivity : AppCompatActivity() {
         longitude: String = Constants.DEFAULT_LONGITUDE
     ) {
 
-        OneCallClient(latitude, longitude).getOneCallRequest() { response ->
-            val current = response.current
-
-            runOnUiThread {
-                _binding.apply {
-                    current?.let { showData(it) }
-
-                    Log.i("nnnnnnnnnnnnnnnnn", response.timezone.toString())
-
-                    dailyWeatherStateRecycler.adapter = response.daily?.let {
-                        DailyWeatherAdapter(
-                            it
-                        )
-                    }
-                }
-            }
+        val observable = Observable.create { emitter ->
+            emitter.onNext(Status.OnLoading)
+            emitter.onNext(OneCallClient(latitude, longitude).getOneCallRequest())
         }
+
+        observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { response ->
+                    when (response) {
+                        Status.OnLoading -> {
+                            Toast.makeText(this, "loading....", LENGTH_SHORT).show()
+                        }
+                        is Status.OnSuccess -> {
+                            _binding.apply {
+                                response.data?.current?.let { showData(it) }
+
+                                Log.i("nnnnnnnnnnnnnnnnn", response.data?.timezone.toString())
+
+                                dailyWeatherStateRecycler.adapter = response.data?.daily?.let {
+                                    DailyWeatherAdapter(
+                                        it
+                                    )
+                                }
+                            }
+                        }
+                        is Status.OnError -> TODO()
+                    }
+                },
+                { error ->
+//                    Log.i("nnnnnnnnnnnnnnnnn", error.message.toString())
+
+                }
+            )
+
     }
+
 
     @SuppressLint("SetTextI18n")
     fun showData(
@@ -107,12 +132,12 @@ class MainActivity : AppCompatActivity() {
     private fun searchWeather(name: String) {
         WeatherSearchClient(name).getSearchWeather() { response ->
             val coord = response.coord
-            runOnUiThread {
-                makeRequestForCurrentWeather(
-                    latitude = coord?.lat.toString(),
-                    longitude = coord?.lon.toString(),
-                )
-            }
+//            runOnUiThread {
+////                makeRequestForCurrentWeather(
+////                    latitude = coord?.lat.toString(),
+////                    longitude = coord?.lon.toString(),
+////                )
+//            }
         }
     }
 
@@ -202,4 +227,9 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val PERMISSION_REQUEST_ACCESS_LOCATION = Constants.ONE_HUNDRED
     }
+//
+//    override fun onDestroy() {
+//        compositeDisposable.dispose()
+//        super.onDestroy()
+//    }
 }
