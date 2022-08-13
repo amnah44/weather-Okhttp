@@ -1,41 +1,32 @@
 package com.amnah.weather.data.network
 
-import android.util.Log
 import com.amnah.weather.data.model.search.SearchWeatherResponse
 import com.amnah.weather.util.Constants
 import com.google.gson.Gson
-import okhttp3.*
-import java.io.IOException
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class WeatherSearchClient(
-    val cityName: String = Constants.DEFAULT_CITY_NAME
+    private val cityName: String = Constants.DEFAULT_CITY_NAME
 ) {
+
     private val client = OkHttpClient()
 
-    fun getSearchWeather(
-        getSearchWeather: (response: SearchWeatherResponse) -> Unit
-    ) {
+    fun getSearchWeather(): Status<SearchWeatherResponse?> {
         val request = Request.Builder()
-            .url(
-                WeatherSearchClient(cityName = cityName).getWeatherUrl()
-            ).build()
+            .url(WeatherSearchClient(cityName = cityName).getWeatherUrl()).build()
+        val response = client.newCall(request).execute()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.i(Constants.ERROR_MESSAGE, e.message.toString())
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.string().let { jsonString ->
-                    val result = Gson().fromJson(jsonString, SearchWeatherResponse::class.java)
-
-                    getSearchWeather(result)
-                }
-            }
-        })
+        return if (response.isSuccessful) {
+            val result = Gson().fromJson(response.body?.string(), SearchWeatherResponse::class.java)
+            Status.OnSuccess(result)
+        } else {
+            Status.OnFailure(response.message)
+        }
     }
 
-    fun getWeatherUrl(
+    private fun getWeatherUrl(
     ): HttpUrl {
         return HttpUrl.Builder()
             .scheme(Constants.SCHEME)

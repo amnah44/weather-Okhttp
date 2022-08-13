@@ -119,15 +119,26 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun searchWeather(name: String) {
-        WeatherSearchClient(name).getSearchWeather() { response ->
-            val coord = response.coord
-            runOnUiThread {
-                makeRequestForCurrentWeather(
-                    latitude = coord?.lat.toString(),
-                    longitude = coord?.lon.toString(),
-                )
-            }
+
+        val observable = Observable.create { emitter ->
+            emitter.onNext(Status.OnLoading)
+            emitter.onNext(WeatherSearchClient(name).getSearchWeather())
         }
+
+        observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+            { response ->
+                when (response) {
+                    Status.OnLoading -> Toast.makeText(this, "loading", LENGTH_SHORT).show()
+                    is Status.OnSuccess -> Toast.makeText(this, "success", LENGTH_SHORT).show()
+                    is Status.OnFailure -> Toast.makeText(this, "error", LENGTH_SHORT).show()
+                }
+            },
+            { error ->
+
+                Status.OnFailure(error.message)
+
+            }
+        ).addDisposable(compositeDisposable)
     }
 
 
