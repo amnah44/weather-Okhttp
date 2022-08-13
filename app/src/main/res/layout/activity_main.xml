@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:overScrollMode="never"
     android:scrollIndicators="none"
     android:scrollbars="none"
-    android:overScrollMode="never"
     tools:context=".ui.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,6 +14,49 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="@color/white">
+
+        <ImageView
+            android:id="@+id/offlineIcon"
+            android:layout_width="200dp"
+            android:layout_height="230dp"
+            android:src="@drawable/offline"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/dailyWeatherStateRecycler"
+            app:layout_constraintEnd_toEndOf="@+id/cardOfCurrentWeather"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="@+id/cardOfCurrentWeather"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.32999998" />
+
+        <TextView
+            android:id="@+id/errorMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black_200"
+            android:textSize="16sp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@id/offlineIcon"
+            app:layout_constraintStart_toStartOf="@id/offlineIcon"
+            app:layout_constraintEnd_toEndOf="@id/offlineIcon"
+          />
+
+        <TextView
+            android:id="@+id/retryBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Retry"
+            android:drawableEnd="@drawable/ic_restart"
+            android:drawablePadding="8dp"
+            android:textSize="20sp"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@id/errorMessage"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="@id/errorMessage"
+            app:layout_constraintEnd_toEndOf="@id/errorMessage"
+            />
+
 
         <EditText
             android:id="@+id/editSearch"
@@ -52,6 +95,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
+            android:visibility="invisible"
             app:cardBackgroundColor="@color/white_100"
             app:cardCornerRadius="36dp"
             app:cardElevation="0dp"
@@ -68,6 +112,7 @@
             android:id="@+id/currentIconWeather"
             android:layout_width="120dp"
             android:layout_height="120dp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@+id/temperature"
             app:layout_constraintEnd_toEndOf="@+id/cardOfCurrentWeather"
             app:layout_constraintHorizontal_bias="0.498"
@@ -79,9 +124,9 @@
             android:id="@+id/temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="----------"
             android:textColor="@color/purple_400"
             android:textSize="28sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/currentStateWeather"
             app:layout_constraintEnd_toEndOf="@+id/currentIconWeather"
             app:layout_constraintStart_toStartOf="@+id/currentIconWeather" />
@@ -91,9 +136,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="----------"
             android:textColor="@color/purple_400"
             android:textSize="28sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/date"
             app:layout_constraintEnd_toEndOf="@+id/temperature"
             app:layout_constraintStart_toStartOf="@+id/temperature" />
@@ -103,9 +148,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="----------"
             android:textColor="@color/purple_400"
             android:textSize="14sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/materialDivider"
             app:layout_constraintEnd_toEndOf="@+id/currentStateWeather"
             app:layout_constraintStart_toStartOf="@+id/currentStateWeather" />
@@ -118,6 +163,7 @@
             android:layout_marginEnd="50dp"
             android:layout_marginBottom="16dp"
             android:background="@color/purple_trans"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@+id/iconHumidity"
             app:layout_constraintEnd_toEndOf="@+id/cardOfCurrentWeather"
             app:layout_constraintStart_toStartOf="@+id/cardOfCurrentWeather"
@@ -130,6 +176,7 @@
             android:layout_marginStart="18dp"
             android:layout_marginBottom="8dp"
             android:src="@drawable/ic_wind"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/tempWind"
             app:layout_constraintStart_toStartOf="@+id/materialDivider" />
 
@@ -138,9 +185,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="-----"
             android:textColor="@color/purple_400"
             android:textSize="14sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@+id/txtWind"
             app:layout_constraintEnd_toEndOf="@+id/iconWind"
             app:layout_constraintStart_toStartOf="@+id/iconWind" />
@@ -153,6 +200,7 @@
             android:text="Wind"
             android:textColor="@color/purple_400"
             android:textSize="12sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@+id/cardOfCurrentWeather"
             app:layout_constraintEnd_toEndOf="@+id/tempWind"
             app:layout_constraintStart_toStartOf="@+id/tempWind" />
@@ -163,6 +211,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:src="@drawable/ic_humidity"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/tempHumidity"
             app:layout_constraintEnd_toStartOf="@+id/iconClouds"
             app:layout_constraintStart_toEndOf="@+id/iconWind" />
@@ -175,6 +224,7 @@
             android:text="-----"
             android:textColor="@color/purple_400"
             android:textSize="14sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@+id/txtHumidity"
             app:layout_constraintEnd_toEndOf="@+id/iconHumidity"
             app:layout_constraintStart_toStartOf="@+id/iconHumidity" />
@@ -187,6 +237,7 @@
             android:text="Humidity"
             android:textColor="@color/purple_400"
             android:textSize="12sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@+id/cardOfCurrentWeather"
             app:layout_constraintEnd_toEndOf="@+id/tempHumidity"
             app:layout_constraintStart_toStartOf="@+id/tempHumidity" />
@@ -198,6 +249,7 @@
             android:layout_marginEnd="18dp"
             android:layout_marginBottom="8dp"
             android:src="@drawable/ic_clouds"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/tempClouds"
             app:layout_constraintEnd_toEndOf="@+id/materialDivider" />
 
@@ -209,6 +261,7 @@
             android:text="-----"
             android:textColor="@color/purple_400"
             android:textSize="14sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/txtClouds"
             app:layout_constraintEnd_toEndOf="@+id/iconClouds"
             app:layout_constraintStart_toStartOf="@+id/iconClouds" />
@@ -221,6 +274,7 @@
             android:text="Clouds"
             android:textColor="@color/purple_400"
             android:textSize="12sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@+id/cardOfCurrentWeather"
             app:layout_constraintEnd_toEndOf="@+id/tempClouds"
             app:layout_constraintStart_toStartOf="@+id/tempClouds" />
@@ -234,6 +288,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="18dp"
             android:text="Weather for 7 days"
+            android:visibility="invisible"
             android:textColor="@color/black_200"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="@+id/cardOfCurrentWeather"
@@ -246,7 +301,7 @@
             android:layout_height="200dp"
             android:layout_centerInParent="true"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@+id/cardOfCurrentWeather"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/cardOfCurrentWeather"
@@ -265,6 +320,7 @@
             android:layout_marginBottom="16dp"
             android:backgroundTint="@color/white"
             android:overScrollMode="never"
+            android:visibility="invisible"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -69,11 +69,21 @@ class MainActivity : AppCompatActivity() {
                 when (response) {
                     Status.OnLoading -> {
                         _binding.loadingCard.visibility = View.VISIBLE
+                        _binding.apply {
+                            offlineIcon.visibility = View.INVISIBLE
+                            errorMessage.visibility = View.INVISIBLE
+                            retryBtn.visibility = View.INVISIBLE
+                        }
+                        hideLayout()
                     }
                     is Status.OnSuccess -> {
-                        response.data?.current?.let { showData(it) }
+                        showLayout()
+                        response.data?.current?.let { getWeatherDetails(it) }
                         _binding.apply {
                             loadingCard.visibility = View.INVISIBLE
+                            offlineIcon.visibility = View.INVISIBLE
+                            errorMessage.visibility = View.INVISIBLE
+                            retryBtn.visibility = View.INVISIBLE
                             dailyWeatherStateRecycler.adapter = response.data?.daily?.let {
                                 DailyWeatherAdapter(
                                     it
@@ -81,16 +91,19 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
-                    is Status.OnFailure -> Toast.makeText(this, "error", LENGTH_SHORT).show()
+                    is Status.OnFailure -> {
+                        onErrorLayout("No connection please try again")
+                    }
                 }
             }, {
                 Status.OnFailure(it.message)
+                onErrorLayout("No connection please try again")
             }
         ).addDisposable(compositeDisposable)
     }
 
     @SuppressLint("SetTextI18n")
-    fun showData(
+    fun getWeatherDetails(
         current: Current
     ) {
 
@@ -121,6 +134,70 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showLayout() {
+        _binding.apply {
+            editSearch.visibility = View.VISIBLE
+            searching.visibility = View.VISIBLE
+            cardOfCurrentWeather.visibility = View.VISIBLE
+            weatherFor7Days.visibility = View.VISIBLE
+            currentIconWeather.visibility = View.VISIBLE
+            temperature.visibility = View.VISIBLE
+            currentStateWeather.visibility = View.VISIBLE
+            date.visibility = View.VISIBLE
+            materialDivider.visibility = View.VISIBLE
+            iconWind.visibility = View.VISIBLE
+            tempWind.visibility = View.VISIBLE
+            txtWind.visibility = View.VISIBLE
+            iconHumidity.visibility = View.VISIBLE
+            tempHumidity.visibility = View.VISIBLE
+            txtHumidity.visibility = View.VISIBLE
+            iconClouds.visibility = View.VISIBLE
+            tempClouds.visibility = View.VISIBLE
+            txtClouds.visibility = View.VISIBLE
+            dailyWeatherStateRecycler.visibility = View.VISIBLE
+
+        }
+    }
+
+    private fun hideLayout() {
+        _binding.apply {
+            cardOfCurrentWeather.visibility = View.INVISIBLE
+            weatherFor7Days.visibility = View.INVISIBLE
+            currentIconWeather.visibility = View.INVISIBLE
+            temperature.visibility = View.INVISIBLE
+            currentStateWeather.visibility = View.INVISIBLE
+            date.visibility = View.INVISIBLE
+            materialDivider.visibility = View.INVISIBLE
+            iconWind.visibility = View.INVISIBLE
+            tempWind.visibility = View.INVISIBLE
+            txtWind.visibility = View.INVISIBLE
+            iconHumidity.visibility = View.INVISIBLE
+            tempHumidity.visibility = View.INVISIBLE
+            txtHumidity.visibility = View.INVISIBLE
+            iconClouds.visibility = View.INVISIBLE
+            tempClouds.visibility = View.INVISIBLE
+            txtClouds.visibility = View.INVISIBLE
+            dailyWeatherStateRecycler.visibility = View.INVISIBLE
+        }
+    }
+
+    private fun onErrorLayout(message: String) {
+        _binding.apply {
+            offlineIcon.visibility = View.VISIBLE
+            errorMessage.visibility = View.VISIBLE
+            errorMessage.text = message
+            retryBtn.visibility = View.VISIBLE
+            retryBtn.setOnClickListener {
+                makeRequestForCurrentWeather()
+            }
+        }
+        hideLayout()
+        _binding.apply {
+            cardOfCurrentWeather.visibility = View.INVISIBLE
+            loadingCard.visibility = View.INVISIBLE
+            weatherFor7Days.visibility = View.INVISIBLE
+        }
+    }
 
     private fun searchWeather(name: String) {
 
