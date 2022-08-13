@@ -32,30 +32,34 @@
             android:id="@+id/errorMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black_200"
-            android:textSize="16sp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:textColor="@color/black_200"
+            android:textSize="16sp"
             android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@id/offlineIcon"
-            app:layout_constraintStart_toStartOf="@id/offlineIcon"
             app:layout_constraintEnd_toEndOf="@id/offlineIcon"
-          />
+            app:layout_constraintStart_toStartOf="@id/offlineIcon"
+            app:layout_constraintTop_toBottomOf="@id/offlineIcon" />
 
         <TextView
             android:id="@+id/retryBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Retry"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/retry_shape"
             android:drawableEnd="@drawable/ic_restart"
             android:drawablePadding="8dp"
+            android:paddingStart="18dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="8dp"
+            android:text="Retry"
             android:textSize="20sp"
+            android:textStyle="bold"
             android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@id/errorMessage"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="@id/errorMessage"
             app:layout_constraintEnd_toEndOf="@id/errorMessage"
-            />
+            app:layout_constraintStart_toStartOf="@id/errorMessage"
+            app:layout_constraintTop_toBottomOf="@id/errorMessage" />
 
 
         <EditText
@@ -288,9 +292,9 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="18dp"
             android:text="Weather for 7 days"
-            android:visibility="invisible"
             android:textColor="@color/black_200"
             android:textSize="12sp"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="@+id/cardOfCurrentWeather"
             app:layout_constraintStart_toStartOf="@+id/cardOfCurrentWeather"
             app:layout_constraintTop_toBottomOf="@id/cardOfCurrentWeather" />
