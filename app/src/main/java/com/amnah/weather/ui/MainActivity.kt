@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
@@ -66,10 +67,13 @@ class MainActivity : AppCompatActivity() {
         observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
             { response ->
                 when (response) {
-                    Status.OnLoading -> Toast.makeText(this, "loading", LENGTH_SHORT).show()
+                    Status.OnLoading -> {
+                        _binding.loadingCard.visibility = View.VISIBLE
+                    }
                     is Status.OnSuccess -> {
                         response.data?.current?.let { showData(it) }
                         _binding.apply {
+                            loadingCard.visibility = View.INVISIBLE
                             dailyWeatherStateRecycler.adapter = response.data?.daily?.let {
                                 DailyWeatherAdapter(
                                     it

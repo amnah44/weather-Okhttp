@@ -3,11 +3,11 @@
     <style name="Theme.Weather" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_400</item>
-        <item name="colorPrimaryVariant">@color/purple_50</item>
+        <item name="colorPrimaryVariant">@color/white_100</item>
         <item name="colorOnPrimary">@color/purple_50</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/purple_400</item>
-        <item name="colorSecondaryVariant">@color/purple_400</item>
+        <item name="colorSecondaryVariant">@color/white_100</item>
         <item name="colorOnSecondary">@color/black_200</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
@@ -23,11 +23,11 @@
     <style name="SplashScreenTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_400</item>
-        <item name="colorPrimaryVariant">@color/purple_50</item>
+        <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/purple_50</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/purple_400</item>
-        <item name="colorSecondaryVariant">@color/purple_400</item>
+        <item name="colorSecondaryVariant">@color/white</item>
         <item name="colorOnSecondary">@color/black_200</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
