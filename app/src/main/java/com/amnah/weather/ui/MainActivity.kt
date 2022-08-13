@@ -69,14 +69,14 @@ class MainActivity : AppCompatActivity() {
                 when (response) {
                     Status.OnLoading -> {
                         _binding.loadingCard.visibility = View.VISIBLE
+                        hideLayout()
+                    }
+                    is Status.OnSuccess -> {
                         _binding.apply {
                             offlineIcon.visibility = View.INVISIBLE
                             errorMessage.visibility = View.INVISIBLE
                             retryBtn.visibility = View.INVISIBLE
                         }
-                        hideLayout()
-                    }
-                    is Status.OnSuccess -> {
                         showLayout()
                         response.data?.current?.let { getWeatherDetails(it) }
                         _binding.apply {
@@ -155,14 +155,11 @@ class MainActivity : AppCompatActivity() {
             tempClouds.visibility = View.VISIBLE
             txtClouds.visibility = View.VISIBLE
             dailyWeatherStateRecycler.visibility = View.VISIBLE
-
         }
     }
 
     private fun hideLayout() {
         _binding.apply {
-            cardOfCurrentWeather.visibility = View.INVISIBLE
-            weatherFor7Days.visibility = View.INVISIBLE
             currentIconWeather.visibility = View.INVISIBLE
             temperature.visibility = View.INVISIBLE
             currentStateWeather.visibility = View.INVISIBLE
@@ -178,6 +175,9 @@ class MainActivity : AppCompatActivity() {
             tempClouds.visibility = View.INVISIBLE
             txtClouds.visibility = View.INVISIBLE
             dailyWeatherStateRecycler.visibility = View.INVISIBLE
+            offlineIcon.visibility = View.INVISIBLE
+            errorMessage.visibility = View.INVISIBLE
+            retryBtn.visibility = View.INVISIBLE
         }
     }
 
@@ -208,20 +208,17 @@ class MainActivity : AppCompatActivity() {
 
         observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
             { response ->
-                when (response) {
-                    Status.OnLoading -> Toast.makeText(this, "loading", LENGTH_SHORT).show()
-                    is Status.OnSuccess -> Toast.makeText(this, "success", LENGTH_SHORT).show()
-                    is Status.OnFailure -> Toast.makeText(this, "error", LENGTH_SHORT).show()
-                }
+                val latitude = response.toData()?.coord?.lat.toString()
+                val longitude = response.toData()?.coord?.lon.toString()
+
+                makeRequestForCurrentWeather(latitude, longitude)
             },
             { error ->
-
                 Status.OnFailure(error.message)
-
+                onErrorLayout("No connection please try again")
             }
         ).addDisposable(compositeDisposable)
     }
-
 
     private fun getCurrentLocation() {
         if (checkPermission()) {
